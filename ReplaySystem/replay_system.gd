@@ -297,12 +297,13 @@ func _clear_and_rebuild_scene() -> void:
 		var scene = load(scene_path) as PackedScene
 		if scene:
 			var instance = scene.instantiate()
+			root.add_child(instance)
+			
 			instance.global_position = position
 			instance.rotation = rotation
 			instance.scale = scale
 			instance.is_in_replay_mode = true
 			
-			root.add_child(instance)
 			instantiated_count += 1
 			print("    ✓ 成功创建: ", obj_type, " 位置: ", instance.global_position)
 		else:
