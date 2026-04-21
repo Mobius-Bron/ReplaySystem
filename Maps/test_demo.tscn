@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://u3cagwbadj5q" path="res://Core/Box/hit_box.tscn" id="1_0ovbx"]
 [ext_resource type="PackedScene" uid="uid://ci2ntgs1ndmp3" path="res://Core/Box/fire_box.tscn" id="2_5gp2d"]
 [ext_resource type="PackedScene" uid="uid://custyai4e6c8w" path="res://Core/Character/character_base.tscn" id="3_5gp2d"]
+[ext_resource type="PackedScene" uid="uid://dmww5y2aaqakk" path="res://ReplaySystem/replay_system.tscn" id="4_replay_sys"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1dnkw"]
 
@@ -36,3 +37,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=818425303]
 transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.8660254, 0, -0.8660254, 0.49999997, 0, 13.5756855, 0)
 light_energy = 0.4
+
+[node name="ReplaySystem" parent="." unique_id=721628823 instance=ExtResource("4_replay_sys")]

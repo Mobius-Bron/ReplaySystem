@@ -1,3 +1,8 @@
 [gd_scene format=3 uid="uid://fu21gycxkyo2"]
 
+[ext_resource type="PackedScene" uid="uid://dmww5y2aaqakk" path="res://ReplaySystem/replay_system.tscn" id="1_replay"]
+
 [node name="ReplayDemo" type="Node3D" unique_id=474319317]
+
+[node name="ReplaySystem" parent="." unique_id=1000000010 instance=ExtResource("1_replay")]
+mode_type = 1

@@ -1,82 +1,10 @@
 [gd_scene format=3 uid="uid://dmww5y2aaqakk"]
 
-[sub_resource type="GDScript" id="GDScript_43wcv"]
-script/source = "class_name ReplaySystem
-extends Node3D
-
-@onready var free_camera: Camera3D = $FreeCamera
-
-enum WorkMode{
-	Off,
-	Record,
-	Replay
-}
-
-@export var mode_type: WorkMode = WorkMode.Record
-@export_range(0.0, 30.0)var MoveSpeed: float = 10.0
-@export_range(0.0, 3.0) var RotationSpeed: float = 1.0
-
-var Pitch: float = 0.0   # 上下角度
-var Yaw: float = 0.0     # 左右角度
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	match mode_type:
-		WorkMode.Off:
-			pass ## 不执行任何操作
-		
-		WorkMode.Record:
-			pass 
-			## 记录当前场景的除了自身这个类型外全部类型的信息
-		
-		WorkMode.Replay:
-			pass
-			## 根据记录的场景信息在当前场景的根节点下面实例化全部物品
-
-func _process(_delta: float) -> void:
-	match mode_type:
-		WorkMode.Off:
-			pass ## 不执行任何操作
-		
-		WorkMode.Record:
-			pass 
-			## 记录每一帧的全部变化，包括玩家角色的位置，小球的位置，两种碰撞箱执行的操作
-		
-		WorkMode.Replay:
-			## 根据记录的场景信息在还原全部物品的执行逻辑
-			
-			## 摄像机逻辑
-			var input_dir: Vector3 = Vector3.ZERO
-	
-			if Input.is_key_pressed(KEY_W):
-				input_dir.z -= 1
-			if Input.is_key_pressed(KEY_S):
-				input_dir.z += 1
-			if Input.is_key_pressed(KEY_A):
-				input_dir.x -= 1
-			if Input.is_key_pressed(KEY_D):
-				input_dir.x += 1
-			if Input.is_key_pressed(KEY_Q):
-				input_dir.y += 1
-			if Input.is_key_pressed(KEY_E):
-				input_dir.y -= 1
-			
-			free_camera.transform.origin += input_dir.normalized() * MoveSpeed * _delta
-
-func _input(event: InputEvent) -> void:
-	match mode_type:
-		WorkMode.Off: pass ## 不执行任何操作
-		WorkMode.Record: pass ## 不执行任何操作
-		WorkMode.Replay:
-			## 摄像机逻辑
-			if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-				Yaw -= event.relative.x * RotationSpeed
-				Pitch -= event.relative.y * RotationSpeed
-				Pitch = clamp(Pitch, -90.0, 90.0)
-				rotation = Vector3(deg_to_rad(Pitch), deg_to_rad(Yaw), 0)
-"
+[ext_resource type="Script" uid="uid://cb0ckuut3ryvk" path="res://ReplaySystem/replay_system.gd" id="1_replay"]
 
 [node name="ReplaySystem" type="Node3D" unique_id=721628823]
-script = SubResource("GDScript_43wcv")
+script = ExtResource("1_replay")
+mode_type = 0
 
-[node name="FreeCamera" type="Camera3D" parent="." unique_id=1682675878]
+[node name="FreeCamera" type="Camera3D" parent="." unique_id=183609332]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 1, 1)
