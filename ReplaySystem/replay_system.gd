@@ -386,6 +386,8 @@ func _apply_frame(frame: ReplayFrame) -> void:
 		else:
 			# 创建简单的视觉代理（绿色球体）
 			var proxy = MeshInstance3D.new()
+			get_tree().current_scene.add_child(proxy)
+			
 			proxy.mesh = SphereMesh.new()
 			proxy.mesh.radius = 0.1
 			proxy.mesh.height = 0.2
@@ -398,39 +400,68 @@ func _apply_frame(frame: ReplayFrame) -> void:
 			proxy.name = name
 			proxy.set_process_mode(Node.PROCESS_MODE_ALWAYS)  # 确保不受暂停影响
 			
-			get_tree().current_scene.add_child(proxy)
 			spawned_bullets[name] = proxy
 			print("[ReplaySystem] 创建子弹代理: ", name, " 位置: ", pos)
 
 func _input(event: InputEvent) -> void:
-	if Input.is_key_pressed(KEY_F1):
+	if Input.is_key_pressed(KEY_F1) and mode_type == SystemMode.PLAYBACK:
 		is_paused = not is_paused
 		print("[ReplaySystem] 暂停状态: ", is_paused)
 	
-	if Input.is_key_pressed(KEY_F2):
+	if Input.is_key_pressed(KEY_F2) and mode_type == SystemMode.PLAYBACK:
 		use_free_camera = not use_free_camera
 		if free_camera:
 			free_camera.current = use_free_camera
 		print("[ReplaySystem] 自由相机: ", use_free_camera)
 	
+	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		Yaw -= event.relative.x * RotationSpeed
+		Pitch -= event.relative.y * RotationSpeed
+		
+		Pitch = clamp(Pitch, -90.0, 90.0)
+		
+		free_camera.rotation = Vector3(deg_to_rad(Pitch), deg_to_rad(Yaw), 0)
+	
 func _handle_playback_input() -> void:
 	if use_free_camera and free_camera:
 		var input_dir: Vector3 = Vector3.ZERO
 		
+		# 获取前后左右输入（忽略上下）
 		if Input.is_key_pressed(KEY_W):
-			input_dir.z -= 1
-		if Input.is_key_pressed(KEY_S):
 			input_dir.z += 1
+		if Input.is_key_pressed(KEY_S):
+			input_dir.z -= 1
 		if Input.is_key_pressed(KEY_A):
 			input_dir.x -= 1
 		if Input.is_key_pressed(KEY_D):
 			input_dir.x += 1
 		if Input.is_key_pressed(KEY_Q):
-			input_dir.y += 1
-		if Input.is_key_pressed(KEY_E):
 			input_dir.y -= 1
+		if Input.is_key_pressed(KEY_E):
+			input_dir.y += 1
 		
-		free_camera.global_position += input_dir.normalized() * MoveSpeed * get_process_delta_time()
+		if input_dir != Vector3.ZERO:
+			input_dir = input_dir.normalized()
+			
+			# 获取摄像机的朝向，但忽略俯仰角（只保留水平旋转）
+			var camera_basis: Basis = free_camera.global_transform.basis
+			var forward: Vector3 = -camera_basis.z  # 摄像机的前方向
+			var right: Vector3 = camera_basis.x      # 摄像机的右方向
+			
+			# 将方向投影到水平面上（忽略Y轴分量）
+			forward.y = 0
+			right.y = 0
+			forward = forward.normalized()
+			right = right.normalized()
+			
+			# 根据摄像机方向计算最终移动向量
+			var move_dir: Vector3 = Vector3.ZERO
+			move_dir += forward * input_dir.z  # W/S 前后
+			move_dir += right * input_dir.x    # A/D 左右
+			move_dir.y = input_dir.y           # Q/E 上下保持不变
+			
+			# 应用移动
+			free_camera.global_position += move_dir * MoveSpeed * get_process_delta_time()
 
 func stop_and_save_recording() -> void:
 	if mode_type != SystemMode.RECORDING:
