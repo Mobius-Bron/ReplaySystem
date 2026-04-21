@@ -57,31 +57,31 @@ func _exit_tree() -> void:
 	stop_and_save_recording()
 
 func _start_recording() -> void:
-	print("========================================")
-	print("[ReplaySystem] 开始录制...")
-	print("========================================")
+	# print("========================================")
+	# print("[ReplaySystem] 开始录制...")
+	# print("========================================")
 	
 	replay_data = ReplayData.new()
 	current_time = 0.0
 	last_sample_time = 0.0
 	
 	var root = get_tree().current_scene
-	print("[ReplaySystem] 当前场景: ", root.name)
-	print("[ReplaySystem] 场景子节点数: ", root.get_child_count())
+	# print("[ReplaySystem] 当前场景: ", root.name)
+	# print("[ReplaySystem] 场景子节点数: ", root.get_child_count())
 	
 	# 记录场景中所有对象的信息
 	_record_scene_objects()
 	
 	if free_camera:
 		free_camera.current = false
-		print("[ReplaySystem] 自由相机已禁用")
+		# print("[ReplaySystem] 自由相机已禁用")
 	
-	print("[ReplaySystem] 录制系统就绪!")
-	print("  - 记录的场景对象数: ", replay_data.scene_object_types.size())
-	print("========================================")
+	# print("[ReplaySystem] 录制系统就绪!")
+	# print("  - 记录的场景对象数: ", replay_data.scene_object_types.size())
+	# print("========================================")
 
 func _record_scene_objects() -> void:
-	print("[ReplaySystem] 正在扫描场景对象...")
+	# print("[ReplaySystem] 正在扫描场景对象...")
 	var root = get_tree().current_scene
 	
 	if not root:
@@ -93,10 +93,10 @@ func _record_scene_objects() -> void:
 	var hitbox_count = 0
 	var env_count = 0
 	
-	print("[ReplaySystem] 遍历场景中的 ", root.get_child_count(), " 个对象...")
+	# print("[ReplaySystem] 遍历场景中的 ", root.get_child_count(), " 个对象...")
 	
 	for child in root.get_children():
-		print("  检查对象: ", child.name, " (类型: ", child.get_class(), ")")
+		# print("  检查对象: ", child.name, " (类型: ", child.get_class(), ")")
 		
 		# 玩家角色
 		if child is CharacterBody3D:
@@ -106,7 +106,7 @@ func _record_scene_objects() -> void:
 			replay_data.scene_object_rotations.append(child.rotation)
 			replay_data.scene_object_scales.append(child.scale)
 			player_count += 1
-			print("    ✓ 识别为玩家，位置: ", child.global_position)
+			# print("    ✓ 识别为玩家，位置: ", child.global_position)
 		
 		# FireBox
 		elif "firebox" in child.name.to_lower():
@@ -116,7 +116,7 @@ func _record_scene_objects() -> void:
 			replay_data.scene_object_rotations.append(child.rotation)
 			replay_data.scene_object_scales.append(child.scale)
 			firebox_count += 1
-			print("    ✓ 识别为FireBox，位置: ", child.global_position)
+			# print("    ✓ 识别为FireBox，位置: ", child.global_position)
 		
 		# HitBox
 		elif "hitbox" in child.name.to_lower():
@@ -126,7 +126,7 @@ func _record_scene_objects() -> void:
 			replay_data.scene_object_rotations.append(child.rotation)
 			replay_data.scene_object_scales.append(child.scale)
 			hitbox_count += 1
-			print("    ✓ 识别为HitBox，位置: ", child.global_position)
+			# print("    ✓ 识别为HitBox，位置: ", child.global_position)
 		
 		# 地面（MeshInstance3D）
 		elif child is MeshInstance3D and ("ground" in child.name.to_lower() or "floor" in child.name.to_lower()):
@@ -136,7 +136,7 @@ func _record_scene_objects() -> void:
 			replay_data.env_object_rotations.append(child.rotation)
 			replay_data.env_object_scales.append(child.scale)
 			env_count += 1
-			print("    ✓ 识别为地面，路径: res://Core/Env/ground.tscn，位置: ", child.global_position)
+			# print("    ✓ 识别为地面，路径: res://Core/Env/ground.tscn，位置: ", child.global_position)
 		
 		# 光源
 		elif child is Light3D:
@@ -147,18 +147,19 @@ func _record_scene_objects() -> void:
 			replay_data.env_object_rotations.append(child.rotation)
 			replay_data.env_object_scales.append(child.scale)
 			env_count += 1
-			print("    ✓ 识别为光源(", light_type, ")，路径: res://Core/Env/light.tscn，位置: ", child.global_position)
+			# print("    ✓ 识别为光源(", light_type, ")，路径: res://Core/Env/light.tscn，位置: ", child.global_position)
 		
 		else:
-			print("    - 跳过此对象")
+			# print("    - 跳过此对象")
+			pass
 	
-	print("[ReplaySystem] 场景扫描完成:")
-	print("  - 玩家数量: ", player_count)
-	print("  - FireBox数量: ", firebox_count)
-	print("  - HitBox数量: ", hitbox_count)
-	print("  - 环境对象数量: ", env_count)
-	print("  - 总游戏对象数: ", replay_data.scene_object_types.size())
-	print("  - 总环境对象数: ", replay_data.env_object_types.size())
+	# print("[ReplaySystem] 场景扫描完成:")
+	# print("  - 玩家数量: ", player_count)
+	# print("  - FireBox数量: ", firebox_count)
+	# print("  - HitBox数量: ", hitbox_count)
+	# print("  - 环境对象数量: ", env_count)
+	# print("  - 总游戏对象数: ", replay_data.scene_object_types.size())
+	# print("  - 总环境对象数: ", replay_data.env_object_types.size())
 
 func _tick_recording(delta: float) -> void:
 	current_time += delta
@@ -186,20 +187,20 @@ func _sample_frame() -> void:
 	
 	replay_data.frames.append(frame)
 	
-	if replay_data.frames.size() % 10 == 0:
-		print("[ReplaySystem] 已录制帧数: ", replay_data.frames.size(), " 当前时间: ", current_time)
+	# if replay_data.frames.size() % 10 == 0:
+	# 	print("[ReplaySystem] 已录制帧数: ", replay_data.frames.size(), " 当前时间: ", current_time)
 
 func _start_playback() -> void:
-	print("========================================")
-	print("[ReplaySystem] 开始重播...")
-	print("========================================")
+	# print("========================================")
+	# print("[ReplaySystem] 开始重播...")
+	# print("========================================")
 	
 	if not ResourceLoader.exists(record_file_path):
 		push_error("录制文件不存在: " + record_file_path)
 		mode_type = SystemMode.OFF
 		return
 	
-	print("[ReplaySystem] 加载录制文件: ", record_file_path)
+	# print("[ReplaySystem] 加载录制文件: ", record_file_path)
 	replay_data = ResourceLoader.load(record_file_path) as ReplayData
 	
 	if not replay_data:
@@ -207,10 +208,10 @@ func _start_playback() -> void:
 		mode_type = SystemMode.OFF
 		return
 	
-	print("[ReplaySystem] 数据加载成功!")
-	print("  - 总帧数: ", replay_data.frames.size())
-	print("  - 场景对象数: ", replay_data.scene_object_types.size())
-	print("  - 总时长: ", replay_data.total_duration)
+	# print("[ReplaySystem] 数据加载成功!")
+	# print("  - 总帧数: ", replay_data.frames.size())
+	# print("  - 场景对象数: ", replay_data.scene_object_types.size())
+	# print("  - 总时长: ", replay_data.total_duration)
 	
 	current_time = 0.0
 	is_paused = false
@@ -218,40 +219,40 @@ func _start_playback() -> void:
 	spawned_bullets.clear()
 	
 	# 清空当前场景并重建
-	print("[ReplaySystem] 正在重建场景...")
+	# print("[ReplaySystem] 正在重建场景...")
 	await _clear_and_rebuild_scene()
 	
 	# 应用第一帧
 	if replay_data.frames.size() > 0:
-		print("[ReplaySystem] 应用初始帧状态...")
+		# print("[ReplaySystem] 应用初始帧状态...")
 		_apply_frame(replay_data.frames[0])
 	
 	_setup_playback_camera()
 	
-	print("[ReplaySystem] 重播系统就绪!")
-	print("========================================")
+	# print("[ReplaySystem] 重播系统就绪!")
+	# print("========================================")
 
 func _clear_and_rebuild_scene() -> void:
 	var root = get_tree().current_scene
 	
-	print("[ReplaySystem] 清空现有场景对象...")
+	# print("[ReplaySystem] 清空现有场景对象...")
 	var deleted_count = 0
 	for child in root.get_children():
 		if child != self and not (child is Camera3D):
 			child.queue_free()
 			deleted_count += 1
-	print("  - 删除了 ", deleted_count, " 个对象")
+	# print("  - 删除了 ", deleted_count, " 个对象")
 	
 	# 等待删除完成
 	await get_tree().process_frame
-	print("[ReplaySystem] 场景已清空")
+	# print("[ReplaySystem] 场景已清空")
 	
 	# 根据录制数据重建场景
-	print("[ReplaySystem] 开始实例化场景对象...")
+	# print("[ReplaySystem] 开始实例化场景对象...")
 	var instantiated_count = 0
 	
 	# 1. 先实例化环境对象（地面和光源）
-	print("[ReplaySystem] 正在重建环境对象...")
+	# print("[ReplaySystem] 正在重建环境对象...")
 	for i in range(replay_data.env_object_types.size()):
 		var env_type = replay_data.env_object_types[i]
 		var scene_path = replay_data.env_object_paths[i]
@@ -259,7 +260,7 @@ func _clear_and_rebuild_scene() -> void:
 		var rotation = replay_data.env_object_rotations[i]
 		var scale = replay_data.env_object_scales[i]
 		
-		print("  → 实例化环境对象: ", env_type, " 路径: ", scene_path)
+		# print("  → 实例化环境对象: ", env_type, " 路径: ", scene_path)
 		
 		if not ResourceLoader.exists(scene_path):
 			push_error("预制体不存在: " + scene_path)
@@ -275,12 +276,12 @@ func _clear_and_rebuild_scene() -> void:
 			instance.scale = scale
 			
 			instantiated_count += 1
-			print("    ✓ 成功创建: ", env_type, " 位置: ", instance.global_position)
+			# print("    ✓ 成功创建: ", env_type, " 位置: ", instance.global_position)
 		else:
 			push_error("加载预制体失败: " + scene_path)
 	
 	# 2. 实例化游戏对象（Player、FireBox、HitBox）
-	print("[ReplaySystem] 正在重建游戏对象...")
+	# print("[ReplaySystem] 正在重建游戏对象...")
 	for i in range(replay_data.scene_object_types.size()):
 		var obj_type = replay_data.scene_object_types[i]
 		var scene_path = replay_data.scene_object_paths[i]
@@ -288,7 +289,7 @@ func _clear_and_rebuild_scene() -> void:
 		var rotation = replay_data.scene_object_rotations[i]
 		var scale = replay_data.scene_object_scales[i]
 		
-		print("  → 实例化: ", obj_type, " 路径: ", scene_path)
+		# print("  → 实例化: ", obj_type, " 路径: ", scene_path)
 		
 		if not ResourceLoader.exists(scene_path):
 			push_error("预制体不存在: " + scene_path)
@@ -305,15 +306,15 @@ func _clear_and_rebuild_scene() -> void:
 			instance.is_in_replay_mode = true
 			
 			instantiated_count += 1
-			print("    ✓ 成功创建: ", obj_type, " 位置: ", instance.global_position)
+			# print("    ✓ 成功创建: ", obj_type, " 位置: ", instance.global_position)
 		else:
 			push_error("加载预制体失败: " + scene_path)
 	
-	print("[ReplaySystem] 场景重建完成，共创建 ", instantiated_count, " 个对象")
+	# print("[ReplaySystem] 场景重建完成，共创建 ", instantiated_count, " 个对象")
 	
 	# 再等待一帧确保实例化完成
 	await get_tree().process_frame
-	print("[ReplaySystem] 所有对象初始化完毕!")
+	# print("[ReplaySystem] 所有对象初始化完毕!")
 
 func _setup_playback_camera() -> void:
 	if free_camera:
@@ -328,7 +329,7 @@ func _tick_playback(delta: float) -> void:
 	current_time += delta
 	
 	if current_time >= replay_data.total_duration and replay_data.total_duration > 0:
-		print("[ReplaySystem] 重播完成")
+		# print("[ReplaySystem] 重播完成")
 		is_paused = true
 		return
 	
@@ -402,18 +403,18 @@ func _apply_frame(frame: ReplayFrame) -> void:
 			proxy.set_process_mode(Node.PROCESS_MODE_ALWAYS)  # 确保不受暂停影响
 			
 			spawned_bullets[name] = proxy
-			print("[ReplaySystem] 创建子弹代理: ", name, " 位置: ", pos)
+			# print("[ReplaySystem] 创建子弹代理: ", name, " 位置: ", pos)
 
 func _input(event: InputEvent) -> void:
 	if Input.is_key_pressed(KEY_F1) and mode_type == SystemMode.PLAYBACK:
 		is_paused = not is_paused
-		print("[ReplaySystem] 暂停状态: ", is_paused)
+		# print("[ReplaySystem] 暂停状态: ", is_paused)
 	
 	if Input.is_key_pressed(KEY_F2) and mode_type == SystemMode.PLAYBACK:
 		use_free_camera = not use_free_camera
 		if free_camera:
 			free_camera.current = use_free_camera
-		print("[ReplaySystem] 自由相机: ", use_free_camera)
+		# print("[ReplaySystem] 自由相机: ", use_free_camera)
 	
 	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		Yaw -= event.relative.x * RotationSpeed
@@ -468,32 +469,33 @@ func stop_and_save_recording() -> void:
 	if mode_type != SystemMode.RECORDING:
 		return
 	
-	print("========================================")
-	print("[ReplaySystem] 停止录制并保存...")
-	print("========================================")
+	# print("========================================")
+	# print("[ReplaySystem] 停止录制并保存...")
+	# print("========================================")
 	
 	if replay_data.frames.size() > 0:
 		replay_data.total_duration = replay_data.frames[-1].timestamp
 	
-	print("[ReplaySystem] 录制统计:")
-	print("  - 总帧数: ", replay_data.frames.size())
-	print("  - 总时长: ", replay_data.total_duration, " 秒")
+	# print("[ReplaySystem] 录制统计:")
+	# print("  - 总帧数: ", replay_data.frames.size())
+	# print("  - 总时长: ", replay_data.total_duration, " 秒")
 	
 	# 确保目录存在
 	var dir = DirAccess.open("res://replaysystem")
 	if not dir:
 		DirAccess.make_dir_recursive_absolute("res://replaysystem/data")
-		print("[ReplaySystem] 创建数据目录: res://replaysystem/data")
+		# print("[ReplaySystem] 创建数据目录: res://replaysystem/data")
 	
 	# 使用正确的路径
 	var save_path = "res://replaysystem/data/ReplayData.res"
 	var save_error = ResourceSaver.save(replay_data, save_path)
 	
 	if save_error == OK:
-		print("[ReplaySystem] ✓ 录制已保存到: ", save_path)
+		# print("[ReplaySystem] ✓ 录制已保存到: ", save_path)
+		pass
 	else:
 		push_error("[ReplaySystem] ✗ 保存失败: " + str(save_error))
 	
 	mode_type = SystemMode.OFF
 	set_process(false)
-	print("========================================")
+	# print("========================================")
