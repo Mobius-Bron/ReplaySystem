@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://ci2ntgs1ndmp3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_luil8"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_luil8"]
+transparency = 1
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_color = Color(0, 0.40392157, 1, 0.47058824)
+
+[sub_resource type="BoxMesh" id="BoxMesh_luil8"]
+material = SubResource("StandardMaterial3D_luil8")
+
+[node name="FireBox" type="Node3D" unique_id=1302450880]
+
+[node name="FireBoxArea" type="Area3D" parent="." unique_id=1937198419]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FireBoxArea" unique_id=1883609884]
+shape = SubResource("BoxShape3D_luil8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=856329474]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("BoxMesh_luil8")

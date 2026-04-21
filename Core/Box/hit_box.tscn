@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://u3cagwbadj5q"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m43v3"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m43v3"]
+transparency = 1
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_color = Color(1, 1, 0, 0.47058824)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ud2q5"]
+material = SubResource("StandardMaterial3D_m43v3")
+
+[node name="HitBox" type="Node3D" unique_id=381301644]
+
+[node name="HitBoxArea" type="Area3D" parent="." unique_id=2116593835]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitBoxArea" unique_id=2003272267]
+shape = SubResource("BoxShape3D_m43v3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2028504267]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("BoxMesh_ud2q5")

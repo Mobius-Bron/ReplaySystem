@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://c1hgf6h8pvma0"]
+
+[ext_resource type="PackedScene" uid="uid://u3cagwbadj5q" path="res://Core/Box/hit_box.tscn" id="1_0ovbx"]
+[ext_resource type="PackedScene" uid="uid://ci2ntgs1ndmp3" path="res://Core/Box/fire_box.tscn" id="2_5gp2d"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1dnkw"]
+
+[node name="TestDemo" type="Node3D" unique_id=394879616]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1449829027]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0)
+mesh = SubResource("PlaneMesh_1dnkw")
+
+[node name="HitBox" parent="." unique_id=1321712480 instance=ExtResource("1_0ovbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7841, 0, 3.855855)
+
+[node name="FireBox" parent="." unique_id=2123103194 instance=ExtResource("2_5gp2d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3766549, 0, 2.029777)

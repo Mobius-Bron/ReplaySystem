@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://custyai4e6c8w"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5fixr"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hai7t"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cjgmb"]
+material = SubResource("StandardMaterial3D_hai7t")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hai7t"]
+
+[node name="CharacterBase" type="CharacterBody3D" unique_id=1729930977]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1602473296]
+shape = SubResource("CapsuleShape3D_5fixr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1426789648]
+mesh = SubResource("CapsuleMesh_cjgmb")
+
+[node name="CharacterArea" type="Area3D" parent="." unique_id=1531508979]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterArea" unique_id=1390874989]
+shape = SubResource("CapsuleShape3D_hai7t")
