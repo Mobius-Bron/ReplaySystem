@@ -15,8 +15,20 @@ mesh = SubResource("PlaneMesh_1dnkw")
 [node name="HitBox" parent="." unique_id=1321712480 instance=ExtResource("1_0ovbx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 0)
 
+[node name="HitBox2" parent="." unique_id=1716671588 instance=ExtResource("1_0ovbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, -3)
+
+[node name="HitBox3" parent="." unique_id=381301644 instance=ExtResource("1_0ovbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 3)
+
 [node name="FireBox" parent="." unique_id=2123103194 instance=ExtResource("2_5gp2d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 0)
+
+[node name="FireBox2" parent="." unique_id=1302450880 instance=ExtResource("2_5gp2d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, -3)
+
+[node name="FireBox3" parent="." unique_id=511377271 instance=ExtResource("2_5gp2d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 3)
 
 [node name="CharacterBase" parent="." unique_id=1729930977 instance=ExtResource("3_5gp2d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
