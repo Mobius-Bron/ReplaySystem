@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://u3cagwbadj5q"]
 
+[ext_resource type="Script" uid="uid://danpon6uw4udj" path="res://Core/Box/hit_box.gd" id="1_ud2q5"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_m43v3"]
 size = Vector3(2, 2, 2)
 
@@ -13,6 +15,7 @@ albedo_color = Color(1, 1, 0, 0.47058824)
 material = SubResource("StandardMaterial3D_m43v3")
 
 [node name="HitBox" type="Node3D" unique_id=381301644]
+script = ExtResource("1_ud2q5")
 
 [node name="HitBoxArea" type="Area3D" parent="." unique_id=2116593835]
 
@@ -22,3 +25,5 @@ shape = SubResource("BoxShape3D_m43v3")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2028504267]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("BoxMesh_ud2q5")
+
+[connection signal="area_entered" from="HitBoxArea" to="." method="_on_hit_box_area_area_entered"]

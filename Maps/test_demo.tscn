@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://u3cagwbadj5q" path="res://Core/Box/hit_box.tscn" id="1_0ovbx"]
 [ext_resource type="PackedScene" uid="uid://ci2ntgs1ndmp3" path="res://Core/Box/fire_box.tscn" id="2_5gp2d"]
+[ext_resource type="PackedScene" uid="uid://custyai4e6c8w" path="res://Core/Character/character_base.tscn" id="3_5gp2d"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1dnkw"]
 
@@ -12,7 +13,14 @@ transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0)
 mesh = SubResource("PlaneMesh_1dnkw")
 
 [node name="HitBox" parent="." unique_id=1321712480 instance=ExtResource("1_0ovbx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7841, 0, 3.855855)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 0)
 
 [node name="FireBox" parent="." unique_id=2123103194 instance=ExtResource("2_5gp2d")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3766549, 0, 2.029777)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 0)
+
+[node name="CharacterBase" parent="." unique_id=1729930977 instance=ExtResource("3_5gp2d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=818425303]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.8660254, 0, -0.8660254, 0.49999997, 0, 13.5756855, 0)
+light_energy = 0.4

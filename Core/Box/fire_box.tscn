@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://ci2ntgs1ndmp3"]
 
+[ext_resource type="Script" uid="uid://24wlvmxqowm3" path="res://Core/Box/fire_box.gd" id="1_ksl2q"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_luil8"]
 size = Vector3(2, 2, 2)
 
@@ -13,6 +15,7 @@ albedo_color = Color(0, 0.40392157, 1, 0.47058824)
 material = SubResource("StandardMaterial3D_luil8")
 
 [node name="FireBox" type="Node3D" unique_id=1302450880]
+script = ExtResource("1_ksl2q")
 
 [node name="FireBoxArea" type="Area3D" parent="." unique_id=1937198419]
 
@@ -22,3 +25,5 @@ shape = SubResource("BoxShape3D_luil8")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=856329474]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("BoxMesh_luil8")
+
+[connection signal="area_entered" from="FireBoxArea" to="." method="_on_fire_box_area_area_entered"]

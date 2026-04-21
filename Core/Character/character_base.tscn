@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://custyai4e6c8w"]
 
+[ext_resource type="Script" uid="uid://bmwlxydimk5kt" path="res://Core/Character/character_base.gd" id="1_hai7t"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5fixr"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hai7t"]
@@ -11,6 +13,7 @@ material = SubResource("StandardMaterial3D_hai7t")
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hai7t"]
 
 [node name="CharacterBase" type="CharacterBody3D" unique_id=1729930977]
+script = ExtResource("1_hai7t")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1602473296]
 shape = SubResource("CapsuleShape3D_5fixr")
@@ -22,3 +25,6 @@ mesh = SubResource("CapsuleMesh_cjgmb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterArea" unique_id=1390874989]
 shape = SubResource("CapsuleShape3D_hai7t")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1995383558]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 20, 0)
