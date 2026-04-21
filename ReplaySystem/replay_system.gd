@@ -91,8 +91,7 @@ func _record_scene_objects() -> void:
 	var player_count = 0
 	var firebox_count = 0
 	var hitbox_count = 0
-	var ground_count = 0
-	var light_count = 0
+	var env_count = 0
 	
 	print("[ReplaySystem] 遍历场景中的 ", root.get_child_count(), " 个对象...")
 	
@@ -131,33 +130,24 @@ func _record_scene_objects() -> void:
 		
 		# 地面（MeshInstance3D）
 		elif child is MeshInstance3D and ("ground" in child.name.to_lower() or "floor" in child.name.to_lower()):
-			replay_data.scene_object_types.append("Ground")
-			replay_data.scene_object_paths.append("")  # 地面不需要预制体
-			replay_data.scene_object_positions.append(child.global_position)
-			replay_data.scene_object_rotations.append(child.rotation)
-			replay_data.scene_object_scales.append(child.scale)
-			ground_count += 1
-			print("    ✓ 识别为地面，位置: ", child.global_position)
+			replay_data.env_object_types.append("Ground")
+			replay_data.env_object_paths.append("res://Core/Env/ground.tscn")
+			replay_data.env_object_positions.append(child.global_position)
+			replay_data.env_object_rotations.append(child.rotation)
+			replay_data.env_object_scales.append(child.scale)
+			env_count += 1
+			print("    ✓ 识别为地面，路径: res://Core/Env/ground.tscn，位置: ", child.global_position)
 		
 		# 光源
 		elif child is Light3D:
 			var light_type = "DirectionalLight3D" if child is DirectionalLight3D else "OmniLight3D"
-			replay_data.light_types.append(light_type)
-			replay_data.light_positions.append(child.global_position)
-			replay_data.light_rotations.append(child.rotation)
-			
-			# 记录光源属性
-			if child is DirectionalLight3D:
-				replay_data.light_energy.append(child.light_energy)
-				replay_data.light_color.append(child.light_color)
-				replay_data.light_range.append(0.0)  # DirectionalLight没有range
-			elif child is OmniLight3D:
-				replay_data.light_energy.append(child.omni_range)
-				replay_data.light_color.append(child.color)
-				replay_data.light_range.append(child.omni_range)
-			
-			light_count += 1
-			print("    ✓ 识别为光源(", light_type, ")，能量: ", child.light_energy, " 颜色: ", child.light_color)
+			replay_data.env_object_types.append(light_type)
+			replay_data.env_object_paths.append("res://Core/Env/light.tscn")
+			replay_data.env_object_positions.append(child.global_position)
+			replay_data.env_object_rotations.append(child.rotation)
+			replay_data.env_object_scales.append(child.scale)
+			env_count += 1
+			print("    ✓ 识别为光源(", light_type, ")，路径: res://Core/Env/light.tscn，位置: ", child.global_position)
 		
 		else:
 			print("    - 跳过此对象")
@@ -166,9 +156,9 @@ func _record_scene_objects() -> void:
 	print("  - 玩家数量: ", player_count)
 	print("  - FireBox数量: ", firebox_count)
 	print("  - HitBox数量: ", hitbox_count)
-	print("  - 地面数量: ", ground_count)
-	print("  - 光源数量: ", light_count)
-	print("  - 总对象数: ", replay_data.scene_object_types.size())
+	print("  - 环境对象数量: ", env_count)
+	print("  - 总游戏对象数: ", replay_data.scene_object_types.size())
+	print("  - 总环境对象数: ", replay_data.env_object_types.size())
 
 func _tick_recording(delta: float) -> void:
 	current_time += delta
@@ -260,51 +250,45 @@ func _clear_and_rebuild_scene() -> void:
 	print("[ReplaySystem] 开始实例化场景对象...")
 	var instantiated_count = 0
 	
-	# 1. 先实例化地面
-	for i in range(replay_data.scene_object_types.size()):
-		if replay_data.scene_object_types[i] == "Ground":
-			var position = replay_data.scene_object_positions[i]
-			var rotation = replay_data.scene_object_rotations[i]
-			var scale = replay_data.scene_object_scales[i]
+	# 1. 先实例化环境对象（地面和光源）
+	print("[ReplaySystem] 正在重建环境对象...")
+	for i in range(replay_data.env_object_types.size()):
+		var env_type = replay_data.env_object_types[i]
+		var scene_path = replay_data.env_object_paths[i]
+		var position = replay_data.env_object_positions[i]
+		var rotation = replay_data.env_object_rotations[i]
+		var scale = replay_data.env_object_scales[i]
+		
+		print("  → 实例化环境对象: ", env_type, " 路径: ", scene_path)
+		
+		if not ResourceLoader.exists(scene_path):
+			push_error("预制体不存在: " + scene_path)
+			continue
+		
+		var scene = load(scene_path) as PackedScene
+		if scene:
+			var instance = scene.instantiate()
+			root.add_child(instance)
 			
-			print("  → 创建地面...")
-			
-			# 创建简单的地面对象
-			var ground = MeshInstance3D.new()
-			root.add_child(ground)
-			
-			ground.name = "Ground"
-			ground.mesh = PlaneMesh.new()
-			ground.mesh.size = Vector2(50, 50)
-			ground.global_position = position
-			ground.rotation = rotation
-			ground.scale = scale
-			
-			# 添加材质
-			var material = StandardMaterial3D.new()
-			material.albedo_color = Color(0.3, 0.3, 0.3, 1)
-			ground.material_override = material
+			instance.global_position = position
+			instance.rotation = rotation
+			instance.scale = scale
 			
 			instantiated_count += 1
-			print("    ✓ 地面创建成功，位置: ", position)
+			print("    ✓ 成功创建: ", env_type, " 位置: ", instance.global_position)
+		else:
+			push_error("加载预制体失败: " + scene_path)
 	
 	# 2. 实例化游戏对象（Player、FireBox、HitBox）
+	print("[ReplaySystem] 正在重建游戏对象...")
 	for i in range(replay_data.scene_object_types.size()):
 		var obj_type = replay_data.scene_object_types[i]
-		
-		if obj_type == "Ground":
-			continue  # 地面已经创建过了
-		
 		var scene_path = replay_data.scene_object_paths[i]
 		var position = replay_data.scene_object_positions[i]
 		var rotation = replay_data.scene_object_rotations[i]
 		var scale = replay_data.scene_object_scales[i]
 		
 		print("  → 实例化: ", obj_type, " 路径: ", scene_path)
-		
-		if scene_path.is_empty():
-			push_error("对象类型 ", obj_type, " 没有预制体路径")
-			continue
 		
 		if not ResourceLoader.exists(scene_path):
 			push_error("预制体不存在: " + scene_path)
@@ -323,34 +307,6 @@ func _clear_and_rebuild_scene() -> void:
 			print("    ✓ 成功创建: ", obj_type, " 位置: ", instance.global_position)
 		else:
 			push_error("加载预制体失败: " + scene_path)
-	
-	# 3. 实例化光源
-	for i in range(replay_data.light_types.size()):
-		var light_type = replay_data.light_types[i]
-		var position = replay_data.light_positions[i]
-		var rotation = replay_data.light_rotations[i]
-		var energy = replay_data.light_energy[i]
-		var color = replay_data.light_color[i]
-		var range_val = replay_data.light_range[i]
-		
-		print("  → 创建光源: ", light_type)
-		
-		var light: Light3D
-		if light_type == "DirectionalLight3D":
-			light = DirectionalLight3D.new()
-			light.light_energy = energy
-			light.light_color = color
-		elif light_type == "OmniLight3D":
-			light = OmniLight3D.new()
-			light.omni_range = range_val
-			light.color = color
-		
-		if light:
-			light.global_position = position
-			light.rotation = rotation
-			root.add_child(light)
-			instantiated_count += 1
-			print("    ✓ 光源创建成功，能量: ", energy, " 颜色: ", color)
 	
 	print("[ReplaySystem] 场景重建完成，共创建 ", instantiated_count, " 个对象")
 	
