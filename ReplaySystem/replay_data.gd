@@ -12,6 +12,14 @@ extends Resource
 @export var scene_object_rotations: Array[Vector3] = []
 @export var scene_object_scales: Array[Vector3] = []
 
+# 灯光信息
+@export var light_types: Array[String] = []
+@export var light_positions: Array[Vector3] = []
+@export var light_rotations: Array[Vector3] = []
+@export var light_energy: Array[float] = []
+@export var light_color: Array[Color] = []
+@export var light_range: Array[float] = []
+
 func clear():
 	frames.clear()
 	events.clear()
@@ -20,4 +28,10 @@ func clear():
 	scene_object_positions.clear()
 	scene_object_rotations.clear()
 	scene_object_scales.clear()
+	light_types.clear()
+	light_positions.clear()
+	light_rotations.clear()
+	light_energy.clear()
+	light_color.clear()
+	light_range.clear()
 	total_duration = 0.0

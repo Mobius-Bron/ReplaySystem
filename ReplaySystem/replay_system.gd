@@ -91,12 +91,15 @@ func _record_scene_objects() -> void:
 	var player_count = 0
 	var firebox_count = 0
 	var hitbox_count = 0
+	var ground_count = 0
+	var light_count = 0
 	
 	print("[ReplaySystem] 遍历场景中的 ", root.get_child_count(), " 个对象...")
 	
 	for child in root.get_children():
 		print("  检查对象: ", child.name, " (类型: ", child.get_class(), ")")
 		
+		# 玩家角色
 		if child is CharacterBody3D:
 			replay_data.scene_object_types.append("Player")
 			replay_data.scene_object_paths.append("res://Core/Character/character_base.tscn")
@@ -106,6 +109,7 @@ func _record_scene_objects() -> void:
 			player_count += 1
 			print("    ✓ 识别为玩家，位置: ", child.global_position)
 		
+		# FireBox
 		elif "firebox" in child.name.to_lower():
 			replay_data.scene_object_types.append("FireBox")
 			replay_data.scene_object_paths.append("res://Core/Box/fire_box.tscn")
@@ -115,6 +119,7 @@ func _record_scene_objects() -> void:
 			firebox_count += 1
 			print("    ✓ 识别为FireBox，位置: ", child.global_position)
 		
+		# HitBox
 		elif "hitbox" in child.name.to_lower():
 			replay_data.scene_object_types.append("HitBox")
 			replay_data.scene_object_paths.append("res://Core/Box/hit_box.tscn")
@@ -123,6 +128,37 @@ func _record_scene_objects() -> void:
 			replay_data.scene_object_scales.append(child.scale)
 			hitbox_count += 1
 			print("    ✓ 识别为HitBox，位置: ", child.global_position)
+		
+		# 地面（MeshInstance3D）
+		elif child is MeshInstance3D and ("ground" in child.name.to_lower() or "floor" in child.name.to_lower()):
+			replay_data.scene_object_types.append("Ground")
+			replay_data.scene_object_paths.append("")  # 地面不需要预制体
+			replay_data.scene_object_positions.append(child.global_position)
+			replay_data.scene_object_rotations.append(child.rotation)
+			replay_data.scene_object_scales.append(child.scale)
+			ground_count += 1
+			print("    ✓ 识别为地面，位置: ", child.global_position)
+		
+		# 光源
+		elif child is Light3D:
+			var light_type = "DirectionalLight3D" if child is DirectionalLight3D else "OmniLight3D"
+			replay_data.light_types.append(light_type)
+			replay_data.light_positions.append(child.global_position)
+			replay_data.light_rotations.append(child.rotation)
+			
+			# 记录光源属性
+			if child is DirectionalLight3D:
+				replay_data.light_energy.append(child.light_energy)
+				replay_data.light_color.append(child.light_color)
+				replay_data.light_range.append(0.0)  # DirectionalLight没有range
+			elif child is OmniLight3D:
+				replay_data.light_energy.append(child.omni_range)
+				replay_data.light_color.append(child.color)
+				replay_data.light_range.append(child.omni_range)
+			
+			light_count += 1
+			print("    ✓ 识别为光源(", light_type, ")，能量: ", child.light_energy, " 颜色: ", child.light_color)
+		
 		else:
 			print("    - 跳过此对象")
 	
@@ -130,6 +166,8 @@ func _record_scene_objects() -> void:
 	print("  - 玩家数量: ", player_count)
 	print("  - FireBox数量: ", firebox_count)
 	print("  - HitBox数量: ", hitbox_count)
+	print("  - 地面数量: ", ground_count)
+	print("  - 光源数量: ", light_count)
 	print("  - 总对象数: ", replay_data.scene_object_types.size())
 
 func _tick_recording(delta: float) -> void:
@@ -222,14 +260,51 @@ func _clear_and_rebuild_scene() -> void:
 	print("[ReplaySystem] 开始实例化场景对象...")
 	var instantiated_count = 0
 	
+	# 1. 先实例化地面
+	for i in range(replay_data.scene_object_types.size()):
+		if replay_data.scene_object_types[i] == "Ground":
+			var position = replay_data.scene_object_positions[i]
+			var rotation = replay_data.scene_object_rotations[i]
+			var scale = replay_data.scene_object_scales[i]
+			
+			print("  → 创建地面...")
+			
+			# 创建简单的地面对象
+			var ground = MeshInstance3D.new()
+			root.add_child(ground)
+			
+			ground.name = "Ground"
+			ground.mesh = PlaneMesh.new()
+			ground.mesh.size = Vector2(50, 50)
+			ground.global_position = position
+			ground.rotation = rotation
+			ground.scale = scale
+			
+			# 添加材质
+			var material = StandardMaterial3D.new()
+			material.albedo_color = Color(0.3, 0.3, 0.3, 1)
+			ground.material_override = material
+			
+			instantiated_count += 1
+			print("    ✓ 地面创建成功，位置: ", position)
+	
+	# 2. 实例化游戏对象（Player、FireBox、HitBox）
 	for i in range(replay_data.scene_object_types.size()):
 		var obj_type = replay_data.scene_object_types[i]
+		
+		if obj_type == "Ground":
+			continue  # 地面已经创建过了
+		
 		var scene_path = replay_data.scene_object_paths[i]
 		var position = replay_data.scene_object_positions[i]
 		var rotation = replay_data.scene_object_rotations[i]
 		var scale = replay_data.scene_object_scales[i]
 		
 		print("  → 实例化: ", obj_type, " 路径: ", scene_path)
+		
+		if scene_path.is_empty():
+			push_error("对象类型 ", obj_type, " 没有预制体路径")
+			continue
 		
 		if not ResourceLoader.exists(scene_path):
 			push_error("预制体不存在: " + scene_path)
@@ -241,12 +316,41 @@ func _clear_and_rebuild_scene() -> void:
 			instance.global_position = position
 			instance.rotation = rotation
 			instance.scale = scale
+			instance.is_in_replay_mode = true
 			
 			root.add_child(instance)
 			instantiated_count += 1
 			print("    ✓ 成功创建: ", obj_type, " 位置: ", instance.global_position)
 		else:
 			push_error("加载预制体失败: " + scene_path)
+	
+	# 3. 实例化光源
+	for i in range(replay_data.light_types.size()):
+		var light_type = replay_data.light_types[i]
+		var position = replay_data.light_positions[i]
+		var rotation = replay_data.light_rotations[i]
+		var energy = replay_data.light_energy[i]
+		var color = replay_data.light_color[i]
+		var range_val = replay_data.light_range[i]
+		
+		print("  → 创建光源: ", light_type)
+		
+		var light: Light3D
+		if light_type == "DirectionalLight3D":
+			light = DirectionalLight3D.new()
+			light.light_energy = energy
+			light.light_color = color
+		elif light_type == "OmniLight3D":
+			light = OmniLight3D.new()
+			light.omni_range = range_val
+			light.color = color
+		
+		if light:
+			light.global_position = position
+			light.rotation = rotation
+			root.add_child(light)
+			instantiated_count += 1
+			print("    ✓ 光源创建成功，能量: ", energy, " 颜色: ", color)
 	
 	print("[ReplaySystem] 场景重建完成，共创建 ", instantiated_count, " 个对象")
 	
@@ -260,6 +364,10 @@ func _setup_playback_camera() -> void:
 	use_free_camera = false
 
 func _tick_playback(delta: float) -> void:
+	# 暂停时不更新
+	if is_paused:
+		return
+	
 	current_time += delta
 	
 	if current_time >= replay_data.total_duration and replay_data.total_duration > 0:
@@ -332,12 +440,13 @@ func _apply_frame(frame: ReplayFrame) -> void:
 			
 			proxy.global_position = pos
 			proxy.name = name
+			proxy.set_process_mode(Node.PROCESS_MODE_ALWAYS)  # 确保不受暂停影响
 			
 			get_tree().current_scene.add_child(proxy)
 			spawned_bullets[name] = proxy
 			print("[ReplaySystem] 创建子弹代理: ", name, " 位置: ", pos)
 
-func _handle_playback_input() -> void:
+func _input(event: InputEvent) -> void:
 	if Input.is_key_pressed(KEY_F1):
 		is_paused = not is_paused
 		print("[ReplaySystem] 暂停状态: ", is_paused)
@@ -348,6 +457,7 @@ func _handle_playback_input() -> void:
 			free_camera.current = use_free_camera
 		print("[ReplaySystem] 自由相机: ", use_free_camera)
 	
+func _handle_playback_input() -> void:
 	if use_free_camera and free_camera:
 		var input_dir: Vector3 = Vector3.ZERO
 		
